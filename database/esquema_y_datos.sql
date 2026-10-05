@@ -17,9 +17,24 @@ CREATE TABLE Candidato (
     correo VARCHAR(70) NOT NULL,
     telefono VARCHAR(20) NOT NULL,
     ruta_cv VARCHAR(255) NOT NULL,
+    origen VARCHAR(20) DEFAULT 'Externo',
     Cargo_id INT NOT NULL,
     CONSTRAINT FK_Candidato_Cargo FOREIGN KEY (Cargo_id) 
         REFERENCES Cargo(id)
+);
+
+CREATE TABLE Rol (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL -- Ej: 'Analista', 'Evaluador', 'Jefatura'
+);
+
+CREATE TABLE Usuario (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre_completo VARCHAR(100) NOT NULL,
+    correo VARCHAR(70) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL, -- Aquí iría la contraseña (hasheada idealmente)
+    Rol_id INT NOT NULL,
+    CONSTRAINT FK_Usuario_Rol FOREIGN KEY (Rol_id) REFERENCES Rol(id)
 );
 
 INSERT INTO Familia_del_cargo (nombre) VALUES 
