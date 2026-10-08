@@ -37,6 +37,25 @@ CREATE TABLE Usuario (
     CONSTRAINT FK_Usuario_Rol FOREIGN KEY (Rol_id) REFERENCES Rol(id)
 );
 
+CREATE TABLE Solicitud (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    fecha_creacion DATE NOT NULL,
+    estado VARCHAR(20) DEFAULT 'Pendiente', -- Los estados según el MVP: Pendiente, En proceso, Finalizada
+    observaciones VARCHAR(MAX),
+    Candidato_id INT NOT NULL,
+    Usuario_Responsable_id INT, -- Puede ser NULL al principio hasta que un analista asigne el evaluador
+    CONSTRAINT FK_Solicitud_Candidato FOREIGN KEY (Candidato_id) REFERENCES Candidato(id),
+    CONSTRAINT FK_Solicitud_Usuario FOREIGN KEY (Usuario_Responsable_id) REFERENCES Usuario(id)
+);
+
+CREATE TABLE Evaluacion (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    fecha_evaluacion DATE NOT NULL,
+    resultado_general VARCHAR(MAX),
+    Solicitud_id INT NOT NULL,
+    CONSTRAINT FK_Evaluacion_Solicitud FOREIGN KEY (Solicitud_id) REFERENCES Solicitud(id)
+);
+
 INSERT INTO Familia_del_cargo (nombre) VALUES 
 ('Profesional A'),
 ('Profesional B C'),
