@@ -77,3 +77,18 @@ INSERT INTO Cargo (nombre, Familia_del_cargo_id) VALUES
 ('Supervisor Planta', 6),
 ('Jefe Area Piscicultura', 7),
 ('Jefe de SSO', 7);
+
+-- Inserción de los roles definidos para el sistema
+INSERT INTO Rol (nombre) VALUES 
+('Administrador académico'),
+('Analista de Reclutamiento'),
+('Profesional Evaluador'),
+('Jefatura o contraparte simulada');
+
+-- Inserción de usuarios ficticios (Evaluadores y Analistas)
+-- Nota: Las contraseñas están en texto plano por ser un MVP académico, idealmente deberían ir hasheadas.
+INSERT INTO Usuario (nombre_completo, correo, password, Rol_id) VALUES 
+('Carmen Analista', 'carmen.analista@ficticio.cl', 'password123', 2), -- Rol 2: Analista de Reclutamiento
+('Roberto Evaluador', 'roberto.evaluador@ficticio.cl', 'password123', 3), -- Rol 3: Profesional Evaluador
+('Lucía Psicóloga', 'lucia.psicologa@ficticio.cl', 'password123', 3), -- Rol 3: Profesional Evaluador
+('Admin Pruebas', 'admin@ficticio.cl', 'password123', 1); -- Rol 1: Administrador académico
