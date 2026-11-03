@@ -1,92 +1,1039 @@
-/* Contenedor principal */
+/* Importar tipografías oficiales desde Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap");
+
+/* ==========================================
+    VARIABLES GLOBALES & RESET BASE
+    ========================================== */
+:root {
+  --slate: #445563; /* Principal: gris azulado */
+  --orange: #eb5f0a; /* Toque: naranjo */
+  --bg: #efe9e5; /* Base: gris cálido */
+  --teal: #2cafa4; /* Complementario: turquesa */
+  --surface: #fff;
+  --line: #d8cfc8;
+  --muted: #5d6a74;
+}
+
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+/* --- ESTILOS DEL FORMULARIO GENERAL --- */
 .formulario-contenedor {
   max-width: 500px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
+  padding: 30px;
+  font-family: "Open Sans", sans-serif;
+  background-color: var(--surface);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(68, 85, 99, 0.15);
 }
 
-/* Diseño del formulario (flexbox para alinear elementos) */
 .formulario-layout {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-/* Mensaje de éxito/error */
 .mensaje-feedback {
   padding: 10px;
   margin-bottom: 10px;
-  background-color: #e2f8e2;
-  color: green;
-  border: 1px solid green;
+  background-color: var(--teal);
+  color: white;
+  border: none;
   border-radius: 4px;
+  font-weight: 600;
+  font-family: "Montserrat", sans-serif;
 }
 
-/* Etiquetas (Labels) */
 .formulario-label {
-  font-weight: bold;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
   display: block;
   margin-bottom: 5px;
+  color: var(--slate);
 }
 
-/* Inputs de texto y Selects */
 .formulario-input {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box; /* Asegura que el padding no desborde el ancho */
+  box-sizing: border-box;
+  color: var(--slate);
+  font-family: "Open Sans", sans-serif;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Input de archivo */
-.formulario-file {
-  width: 100%;
-  margin-top: 5px;
-  margin-bottom: 5px;
+.formulario-input:focus {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 5px rgba(235, 95, 10, 0.3);
 }
 
-/* Botón principal */
 .boton-enviar {
-  padding: 10px 15px;
-  background-color: #0056b3;
+  font-family: "Montserrat", sans-serif;
+  padding: 12px 15px;
+  background-color: var(--slate);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 700;
   transition: background-color 0.3s ease;
+  margin-top: 10px;
 }
 
 .boton-enviar:hover {
-  background-color: #004494;
+  background-color: var(--orange);
 }
 
-/* Botón cuando está cargando/deshabilitado */
 .boton-deshabilitado {
-  background-color: #6c757d;
+  background-color: #a0aab2;
   cursor: not-allowed;
 }
 
-/* Texto de error bajo cada campo */
 .texto-error {
-  color: #d9534f;
+  color: var(--orange);
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 600;
+  font-family: "Open Sans", sans-serif;
   margin-top: 4px;
   display: block;
 }
 
-/* Borde rojo en el input que contiene un error */
 .input-error {
-  border: 1px solid #d9534f !important;
-  background-color: #fff8f8;
+  border: 1px solid var(--orange) !important;
+  background-color: #fffaf7;
 }
 
-/* Estilo para mensaje global de error en la parte superior */
 .mensaje-error-global {
-  background-color: #f8d7da !important;
-  color: #721c24 !important;
-  border-color: #f5c6cb !important;
+  background-color: #fffaf7 !important;
+  color: var(--orange) !important;
+  border: 1px solid var(--orange) !important;
+  border-radius: 4px;
+  padding: 10px;
+  font-weight: 600;
+  font-family: "Open Sans", sans-serif;
+}
+
+/* --- LAYOUT DE LOGIN COMPLETO --- */
+.layout-login-completo {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg);
+  font-family: "Open Sans", sans-serif;
+  color: var(--slate);
+}
+
+.login-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.topbar-title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #777;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.status-pill {
+  background-color: #e0f2f1;
+  color: var(--slate);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--teal);
+  border-radius: 50%;
+}
+
+.login-main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.tarjeta-login-avanzada {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 10px 25px rgba(68, 85, 99, 0.08);
+}
+
+.tarjeta-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.tarjeta-titulo {
+  font-family: "Montserrat", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--slate);
+  margin: 0 0 10px 0;
+  line-height: 1.3;
+}
+
+.tarjeta-subtitulo {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.formulario-login-avanzado {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.label-avanzado {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--slate);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.label-con-enlace {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.link-olvido {
+  font-size: 12px;
+  color: var(--orange);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.input-con-icono {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-con-icono input {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+  color: var(--slate);
+  transition: border-color 0.3s;
+}
+
+.input-con-icono input:focus {
+  outline: none;
+  border-color: var(--orange);
+}
+
+.icono-input {
+  position: absolute;
+  right: 15px;
+  color: #aaa;
+  font-size: 14px;
+}
+
+.opciones-extra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.checkbox-recordar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  cursor: pointer;
+}
+
+.indicador-ssl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #888;
+}
+
+.ssl-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--teal);
+  border-radius: 50%;
+}
+
+.boton-ingresar-naranjo {
+  background-color: var(--orange);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 6px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+.boton-ingresar-naranjo:hover {
+  background-color: #d15208;
+}
+
+.separador-tarjeta {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 30px 0;
+}
+
+.caja-candidato-externo {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fafafa;
+}
+
+.caja-candidato-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+}
+
+.icono-usuario-naranjo {
+  color: var(--orange);
+  font-size: 20px;
+  background-color: #fdeee6;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+.caja-candidato-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--slate);
+}
+
+.caja-candidato-info p {
+  margin: 0;
+  font-size: 11px;
+  color: #777;
+  line-height: 1.4;
+}
+
+.boton-postular-outline {
+  background: transparent;
+  border: 1px solid var(--orange);
+  color: var(--orange);
+  padding: 8px 15px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s;
+}
+
+.boton-postular-outline:hover {
+  background: var(--orange);
+  color: white;
+}
+
+.textos-bajo-tarjeta {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 12px;
+  color: #888;
+  line-height: 1.6;
+}
+
+.textos-bajo-tarjeta p {
+  margin: 0;
+}
+
+/* --- BARRA DE PIE DE PÁGINA (LOGIN) --- */
+.login-footer-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background-color: #f4f4f4;
+  font-size: 12px;
+  color: #888;
+  border-top: 1px solid #ddd;
+}
+
+/* --- SECCIÓN MODIFICADA AQUÍ --- */
+.footer-right {
+  display: flex;
+  gap: 20px;
+  /* He ocultado el contenido de esta sección en el DOM, 
+     pero mantenemos la estructura por si se necesita agregar algo después. */
+  /* Originalmente contenía: Términos, Política y Soporte */
+  visibility: hidden; 
+}
+
+.footer-right a {
+  color: #888;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-right a:hover {
+  color: var(--orange);
+}
+
+/* ==========================================
+    DISEÑO DEL DASHBOARD (AQUACHILE)
+    ========================================== */
+.dash-layout {
+  display: flex;
+  height: 100vh;
+  background-color: var(--bg);
+  font-family: "Open Sans", sans-serif;
+  color: var(--slate);
+  overflow: hidden;
+}
+
+/* --- BARRA LATERAL (DASHBOARD) --- */
+.dash-sidebar {
+  width: 260px;
+  background-color: #ffffff;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+}
+
+.dash-logo-area {
+  display: flex;
+  align-items: center;
+  padding: 0 20px 20px;
+  gap: 10px;
+}
+
+.dash-logo-icon {
+  font-size: 24px;
+}
+
+.dash-logo-text strong {
+  font-family: "Montserrat", sans-serif;
+  font-size: 18px;
+  color: var(--slate);
+}
+
+.dash-logo-text span {
+  color: var(--teal);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.dash-logo-sub {
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--orange);
+  letter-spacing: 1px;
+}
+
+.dash-sidebar-actions {
+  padding: 0 20px 20px;
+}
+
+.dash-sidebar-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #888;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dash-sidebar-title span {
+  color: var(--orange);
+}
+
+.dash-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px;
+  flex: 1;
+}
+
+.dash-nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
+  text-decoration: none;
+  color: #666;
+  font-size: 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.dash-nav-item:hover,
+.dash-nav-item.activo {
+  background-color: #f4f4f4;
+  color: var(--slate);
+  border-left: 4px solid var(--orange);
+}
+
+.dash-icon {
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.dash-badge,
+.dash-badge-naranjo,
+.dash-badge-outline {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.dash-badge {
+  background-color: var(--slate);
+  color: white;
+}
+
+.dash-badge-naranjo {
+  background-color: var(--orange);
+  color: white;
+}
+
+.dash-badge-outline {
+  border: 1px solid var(--orange);
+  color: var(--orange);
+}
+
+.dash-sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid #eee;
+  font-size: 12px;
+}
+
+.dash-metric-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.dash-dot-green {
+  width: 8px;
+  height: 8px;
+  background-color: var(--teal);
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.dash-progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #eee;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.dash-progress-fill {
+  width: 84%;
+  height: 100%;
+  background-color: var(--orange);
+}
+
+/* --- ENVOLTORIO PRINCIPAL (DASHBOARD) --- */
+.dash-main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* --- TOPBAR (DASHBOARD) --- */
+.dash-topbar {
+  height: 60px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+}
+
+.dash-select-faena {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-family: "Open Sans";
+  color: var(--slate);
+  font-weight: 600;
+}
+
+.dash-topbar-search input {
+  width: 350px;
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  font-family: "Open Sans";
+}
+
+.dash-topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.dash-bell {
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.dash-user-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  text-align: right;
+}
+
+.dash-user-info strong {
+  color: var(--slate);
+  font-size: 14px;
+}
+
+/* --- ÁREA DE TRABAJO (DASHBOARD) --- */
+.dash-workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.dash-center-column {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dash-breadcrumb {
+  font-size: 12px;
+  color: #888;
+}
+
+.dash-page-title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 22px;
+  color: var(--slate);
+  margin: 0;
+}
+
+.dash-action-row {
+  display: flex;
+  gap: 15px;
+}
+
+.dash-btn-outline {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: 8px 15px;
+  border-radius: 4px;
+  color: var(--slate);
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "Open Sans";
+  font-size: 13px;
+}
+
+.dash-btn-outline-accent {
+  border-color: #e9551c;
+  color: #e9551c;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.dash-btn-outline-accent:hover:not(:disabled) {
+  background-color: #fff6f1;
+}
+
+.dash-btn-outline-accent:disabled {
+  border-color: #ccc;
+  color: #aaa;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.dash-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.dash-kpi-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-top: 3px solid #ccc;
+}
+
+.dash-kpi-card.border-green {
+  border-top-color: var(--teal);
+}
+
+.kpi-title {
+  font-size: 10px;
+  font-weight: bold;
+  color: #888;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.kpi-value {
+  font-family: "Montserrat", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--slate);
+}
+
+.kpi-value.naranjo {
+  color: var(--orange);
+}
+
+.kpi-value.green {
+  color: var(--teal);
+}
+
+.dash-solicitud-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.solicitud-tag {
+  background: #fdeee6;
+  color: var(--orange);
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.solicitud-estado {
+  display: inline-block;
+  background: #e0f2f1;
+  color: var(--teal);
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.dash-solicitud-card h3 {
+  font-family: "Montserrat", sans-serif;
+  margin: 10px 0 5px;
+  color: var(--slate);
+}
+
+.dash-solicitud-card p {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+}
+
+/* --- PANEL DERECHO (EVALUACIÓN - DASHBOARD) --- */
+.dash-right-panel {
+  flex: 0 0 min(420px, 38vw);
+  min-width: 340px;
+  padding: 24px;
+  background-color: var(--surface);
+  border-left: 1px solid var(--line);
+  box-shadow: -8px 0 24px rgba(68, 85, 99, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  overflow-y: auto;
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.panel-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.panel-badge {
+  color: var(--orange);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.panel-title {
+  margin: 0;
+  color: var(--slate);
+  font-family: "Montserrat", sans-serif;
+  font-size: 20px;
+}
+
+.btn-close {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-close:hover {
+  border-color: var(--orange);
+  background: #fff6f1;
+  color: var(--orange);
+}
+
+.panel-candidate-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--orange);
+  border-radius: 8px;
+  background: #fffaf7;
+}
+
+.panel-field-caption {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.panel-candidato-nombre {
+  margin: 8px 0 4px;
+  color: var(--slate);
+  font-family: "Montserrat", sans-serif;
+  font-size: 18px;
+}
+
+.panel-candidato-cargo {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.panel-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel-section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.panel-section-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  border-radius: 8px;
+  background: #fff0e8;
+  color: var(--orange);
+  font-weight: 700;
+}
+
+.panel-seccion-titulo {
+  margin: 0;
+  color: var(--slate);
+  font-family: "Montserrat", sans-serif;
+  font-size: 15px;
+}
+
+.panel-section-description {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.panel-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.panel-form-field label {
+  color: var(--slate);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.panel-input {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--slate);
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.panel-input:focus {
+  border-color: var(--orange);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(235, 95, 10, 0.12);
+}
+
+.panel-textarea {
+  min-height: 130px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.panel-textarea::placeholder {
+  color: #929ba1;
+}
+
+.panel-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid #eee7e2;
+}
+
+.dash-btn-primary {
+  padding: 9px 14px;
+  border: 1px solid var(--orange);
+  border-radius: 6px;
+  background: var(--orange);
+  color: #fff;
+  font-family: "Open Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.dash-btn-primary:hover {
+  border-color: #d45108;
+  background: #d45108;
+}
+
+@media (max-width: 760px) {
+  .dash-right-panel {
+    position: fixed;
+    z-index: 10;
+    top: 60px;
+    right: 0;
+    bottom: 0;
+    width: min(100%, 420px);
+    min-width: 0;
+    box-shadow: -12px 0 32px rgba(35, 45, 54, 0.18);
+  }
+}
+
+@media (max-width: 420px) {
+  .dash-right-panel {
+    padding: 20px;
+  }
+
+  .panel-footer-actions {
+    flex-direction: column-reverse;
+  }
+
+  .panel-footer-actions button {
+    width: 100%;
+  }
+}
+
+/* Estilo Profesional para Descarga de CV */
+.link-descarga-cv {
+  color: #1a365d; /* Azul oscuro corporativo */
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.3s ease;
+}
+
+.link-descarga-cv:hover {
+  color: #e9551c; /* Naranjo AquaChile */
 }

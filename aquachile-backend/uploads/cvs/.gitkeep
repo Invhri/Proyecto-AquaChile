@@ -1,0 +1,2 @@
+# Crear la carpeta .gitkeep para conservar la estructura
+touch backend/uploads/cvs/.gitkeep

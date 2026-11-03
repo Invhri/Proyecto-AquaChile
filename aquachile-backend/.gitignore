@@ -1,0 +1,13 @@
+# Dependencias locales
+node_modules/
+
+# Variables de entorno con contraseñas reales
+.env
+*.env
+
+# Archivos subidos durante las pruebas (PDFs/CVs)
+uploads/cvs/*
+!uploads/cvs/.gitkeep
+
+# Logs de error
+npm-debug.log*
