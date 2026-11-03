@@ -1,3 +1,14 @@
+-- 1. LIMPIEZA PREVIA (Elimina tablas existentes en orden de dependencias)
+DROP TABLE IF EXISTS Evaluacion CASCADE;
+DROP TABLE IF EXISTS Solicitud CASCADE;
+DROP TABLE IF EXISTS Usuario CASCADE;
+DROP TABLE IF EXISTS Rol CASCADE;
+DROP TABLE IF EXISTS Candidato CASCADE;
+DROP TABLE IF EXISTS Cargo CASCADE;
+DROP TABLE IF EXISTS Familia_del_cargo CASCADE;
+
+-- 2. CREACIÓN DE TABLAS --
+
 CREATE TABLE Familia_del_cargo (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL
@@ -37,7 +48,7 @@ CREATE TABLE Usuario (
 
 CREATE TABLE Solicitud (
     id SERIAL PRIMARY KEY,
-    fecha_creacion DATE NOT NULL,
+    fecha_creacion DATE NOT NULL DEFAULT CURRENT_DATE,
     estado VARCHAR(20) DEFAULT 'Pendiente',
     observaciones TEXT,
     Candidato_id INT NOT NULL,
@@ -48,11 +59,15 @@ CREATE TABLE Solicitud (
 
 CREATE TABLE Evaluacion (
     id SERIAL PRIMARY KEY,
-    fecha_evaluacion DATE NOT NULL,
+    fecha_evaluacion DATE NOT NULL DEFAULT CURRENT_DATE,
+    resultado VARCHAR(50),
     resultado_general TEXT,
+    observaciones TEXT,
     Solicitud_id INT NOT NULL,
-    CONSTRAINT FK_Evaluacion_Solicitud FOREIGN KEY (Solicitud_id) REFERENCES Solicitud(id)
+    CONSTRAINT FK_Evaluacion_Solicitud FOREIGN KEY (Solicitud_id) REFERENCES Solicitud(id) ON DELETE CASCADE
 );
+
+-- 3. INSERCIÓN DE DATOS INICIALES --
 
 INSERT INTO Familia_del_cargo (nombre) VALUES 
 ('Profesional A'),
