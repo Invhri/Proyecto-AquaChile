@@ -1,41 +1,151 @@
-# Sistema de Solicitud de Evaluacion Psicolaboral - AquaChile
+# AquaChile Talentos
 
-## Descripcion del Proyecto
-Este proyecto es una plataforma web desarrollada para automatizar el proceso de solicitudes de evaluacion psicolaboral de candidatos en AquaChile. El sistema cuenta con un formulario que captura los datos del postulante, valida los formatos de documentos (Curriculum Vitae) y maneja dependencias jerarquicas entre familias de cargos y cargos especificos. 
+Aplicación web para gestionar postulaciones y el proceso de evaluación psicolaboral de candidatos. El sistema permite recibir postulaciones, revisar candidatos, solicitar y asignar evaluaciones, registrar resultados y consultar candidatos por estado.
 
-El objetivo final de la aplicacion es integrar esta captura de datos con el ecosistema de Microsoft (SQL Server, SharePoint y Planner) mediante flujos de automatizacion.
+## Funcionalidades
 
-## Tecnologias Utilizadas
-* **Frontend:** React con TypeScript.
-* **Base de Datos:** Microsoft SQL Server (T-SQL).
-* **Integraciones Proyectadas:** Microsoft Power Automate, SharePoint, Microsoft Planner.
+- Formularios de postulación interna y pública con carga de currículum.
+- Listado de candidatos en consideración con acceso a CV, correo y teléfono.
+- Solicitud de evaluación psicolaboral para candidatos que aún no tienen una solicitud.
+- Asignación de solicitudes pendientes a profesionales evaluadores.
+- Registro de resultados de evaluación: aprobado o rechazado, con observaciones.
+- Listas de candidatos aprobados y de descartados o reprobados.
+- Los candidatos descartados o reprobados se muestran en su lista durante un mes; sus registros no se eliminan de la base de datos.
+- Inicio de sesión, administración de usuarios, indicadores y dashboard.
 
-## Estructura del Repositorio
-* **/src:** Contiene el codigo fuente de la aplicacion React, incluyendo los componentes del formulario, estilos y validaciones.
-* **/database:** Almacena los recursos de base de datos como codigo (Database as Code).
-  * `esquema_y_datos.sql`: Script de creacion de tablas y poblado de datos iniciales.
-  * `diagrama_relacional.png`: Modelo fisico de la base de datos.
+## Tecnologias
 
-## Configuracion de la Base de Datos
-El backend utiliza PostgreSQL. Para una base de datos existente, ejecutar las migraciones pendientes de `/aquachile-backend/migrations` en orden; `20261103_add_candidate_lifecycle.sql` agrega el estado y la fecha de cierre de los candidatos y actualiza los resultados ya registrados. La lista de descartados y reprobados conserva únicamente cierres del último mes, sin eliminar su historial de la base de datos.
+- **Frontend:** React 18, TypeScript y React Router.
+- **Backend:** Node.js y Express.
+- **Base de datos:** PostgreSQL, accedida desde el backend con `pg`.
+- **Archivos:** Multer guarda los CV en `aquachile-backend/uploads/cvs`.
+- **Pruebas frontend:** Vitest y Testing Library.
 
-Para una instalación nueva de PostgreSQL, utilizar el esquema `/database/Base de datos Postgre.sql` y luego aplicar `20261103_add_candidate_lifecycle.sql`.
+## Requisitos
 
-## Ejecucion del Frontend
-Para levantar el entorno de desarrollo del formulario en React:
+- Node.js y npm.
+- PostgreSQL.
+- Acceso a una base de datos PostgreSQL local.
 
-1. Abrir una terminal en la raiz del proyecto.
-2. Instalar las dependencias ejecutando:
-   ```bash
-   npm install
-   ```
-3. Iniciar el servidor de desarrollo:
-   ```bash
-   npm start
-   ```
-4. El formulario estara disponible en el navegador local (generalmente en `http://localhost:3000` o `http://localhost:5173`).
+## Estructura del proyecto
 
-## Proximos Pasos (En Desarrollo)
-* **Endpoint de Integracion:** Reemplazar la simulacion de envio en el formulario por una peticion HTTP real hacia un Webhook (Power Automate o backend Node.js).
-* **Gestion de Archivos:** Habilitar el almacenamiento automatico del documento adjunto (Curriculum Vitae) en una ruta especifica de SharePoint/OneDrive.
-* **Tareas Automaticas:** Configurar la generacion de tickets de seguimiento en Microsoft Planner una vez que el registro en la base de datos sea exitoso.
+```text
+src/                              Aplicación React
+  components/                     Barra superior y navegación
+  pages/                          Formularios y pantallas del sistema
+database/
+  Base de datos Postgre.sql       Esquema inicial de PostgreSQL y datos demo
+aquachile-backend/
+  server.js                       API Express
+  db.js                           Configuración de conexión PostgreSQL
+  .env.example                    Plantilla de configuración local
+  migrations/                     Migraciones para bases existentes
+  uploads/cvs/                    Archivos CV cargados localmente
+```
+
+## Configuracion de la base de datos
+
+### Base existente
+
+**No ejecutes `database/Base de datos Postgre.sql` sobre una base que ya contiene datos.** Ese script comienza eliminando las tablas con `DROP TABLE ... CASCADE`, por lo que borraría las tablas y sus registros.
+
+Para actualizar una base existente:
+
+1. Haz un respaldo de la base de datos.
+2. Revisa las migraciones de `aquachile-backend/migrations` y aplica solamente las que aun no se hayan ejecutado, en orden por nombre:
+   - `20261102_align_evaluacion_schema.sql`: agrega `observaciones` a `Evaluacion` si falta y, cuando existe la columna antigua `resultado`, copia sus datos a `resultado_general` donde corresponda.
+   - `20261103_add_candidate_lifecycle.sql`: agrega `estado` y `fecha_cierre` a `Candidato` si faltan y clasifica candidatos con evaluaciones existentes.
+3. No es necesario borrar ni recrear tablas.
+
+Las migraciones usan operaciones condicionales para poder ejecutarse en esquemas que ya tengan algunas de las columnas. De todos modos, respalda la base antes de cualquier cambio.
+
+### Base nueva de desarrollo
+
+1. Crea una base de datos vacía en PostgreSQL.
+2. Conéctate a esa base y ejecuta `database/Base de datos Postgre.sql`.
+3. Ejecuta las migraciones disponibles en `aquachile-backend/migrations` en orden por nombre.
+
+El esquema inicial incluye datos de demostración para cargos, roles y usuarios. Es un script de desarrollo que elimina las tablas existentes antes de crearlas; ejecútalo únicamente en una base desechable o nueva, nunca en una base que quieras conservar.
+
+## Configurar y ejecutar el backend
+
+Desde PowerShell, en la raiz del repositorio:
+
+```powershell
+cd aquachile-backend
+Copy-Item .env.example .env
+```
+
+Edita `aquachile-backend/.env` con los datos de conexion de tu PostgreSQL:
+
+```dotenv
+DB_USER=tu_usuario_postgresql
+DB_HOST=localhost
+DB_NAME=nombre_de_tu_base
+DB_PASSWORD=tu_contrasena_local
+DB_PORT=5432
+```
+
+El archivo `.env` contiene configuración local y está excluido de Git. No subas contraseñas ni credenciales al repositorio.
+
+Instala dependencias e inicia el backend:
+
+```powershell
+npm install
+npm start
+```
+
+Ejecuta estos comandos desde `aquachile-backend`. El API queda disponible en `http://localhost:3001`; puedes verificar la conexion con `GET http://localhost:3001/api/test-db`.
+
+## Ejecutar el frontend
+
+Abre otra terminal en la raiz del repositorio:
+
+```powershell
+npm install
+npm start
+```
+
+El frontend se inicia normalmente en `http://localhost:3000`. Mantén el backend ejecutándose en el puerto `3001` para que la aplicación pueda consultar la base de datos.
+
+## API principal
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/api/test-db` | Comprueba la conexion con PostgreSQL. |
+| `GET` | `/api/candidatos` | Lista candidatos en consideración. |
+| `GET` | `/api/candidatos/aprobados` | Lista candidatos aprobados. |
+| `GET` | `/api/candidatos/archivados` | Lista descartados o reprobados cerrados durante el último mes. |
+| `PATCH` | `/api/candidatos/:id/descartar` | Marca como descartado a un candidato sin solicitud. |
+| `POST` | `/api/solicitudes` | Recibe una postulación con CV o crea una solicitud para un candidato existente. |
+| `GET` | `/api/solicitudes/pendientes` | Lista solicitudes pendientes de asignación. |
+| `GET` | `/api/usuarios/evaluadores` | Lista profesionales evaluadores. |
+| `PUT` | `/api/solicitudes/asignar` | Asigna un evaluador a una solicitud. |
+| `GET` | `/api/evaluaciones/asignadas?correo=...` | Lista evaluaciones en proceso del evaluador. |
+| `POST` | `/api/evaluaciones` | Registra el resultado y finaliza la solicitud. |
+| `GET` | `/api/dashboard-kpis` | Devuelve indicadores del dashboard. |
+| `GET` | `/api/sidebar-metrics` | Devuelve indicadores de la barra lateral. |
+| `POST` | `/api/login` | Inicia sesión. |
+| `GET` | `/api/roles` | Lista roles disponibles. |
+| `GET` | `/api/usuarios` | Lista usuarios. |
+| `POST` | `/api/usuarios` | Crea un usuario. |
+
+Las solicitudes con archivos CV usan `multipart/form-data`. Los CV guardados localmente se sirven desde `/uploads`.
+
+## Pruebas y compilación
+
+Desde la raiz del proyecto:
+
+```powershell
+npm test -- --run
+npm run build
+```
+
+## Equipo
+
+- Richard Hernández
+- Martín Rivas
+
+## Notas para despliegue
+
+El esquema incluye usuarios de demostración y el inicio de sesión corresponde a la implementación actual del proyecto. Antes de usar el sistema en producción, reemplaza o elimina las cuentas de demostración y revisa las medidas de seguridad, gestión de credenciales, almacenamiento de CV y configuración de base de datos.
