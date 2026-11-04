@@ -17,12 +17,9 @@ El objetivo final de la aplicacion es integrar esta captura de datos con el ecos
   * `diagrama_relacional.png`: Modelo fisico de la base de datos.
 
 ## Configuracion de la Base de Datos
-Para inicializar la base de datos localmente y habilitar las opciones del formulario, es necesario ejecutar el script SQL proporcionado.
+El backend utiliza PostgreSQL. Para una base de datos existente, ejecutar las migraciones pendientes de `/aquachile-backend/migrations` en orden; `20261103_add_candidate_lifecycle.sql` agrega el estado y la fecha de cierre de los candidatos y actualiza los resultados ya registrados. La lista de descartados y reprobados conserva únicamente cierres del último mes, sin eliminar su historial de la base de datos.
 
-1. Abrir Microsoft SQL Server Management Studio (SSMS) u otro cliente de base de datos.
-2. Conectarse a la instancia de base de datos local.
-3. Abrir el archivo `/database/esquema_y_datos.sql`.
-4. Ejecutar el script. Esto creara las tablas `Familia_del_cargo`, `Cargo` y `Candidato`, e insertara los datos estaticos necesarios para poblar los menus desplegables dependientes.
+Para una instalación nueva de PostgreSQL, utilizar el esquema `/database/Base de datos Postgre.sql` y luego aplicar `20261103_add_candidate_lifecycle.sql`.
 
 ## Ejecucion del Frontend
 Para levantar el entorno de desarrollo del formulario en React:

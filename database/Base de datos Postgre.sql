@@ -18,6 +18,8 @@ CREATE TABLE Candidato (
     ruta_cv VARCHAR(255) NOT NULL,
     origen VARCHAR(20) DEFAULT 'Externo',
     Cargo_id INT NOT NULL,
+    estado VARCHAR(20) NOT NULL DEFAULT 'En consideración',
+    fecha_cierre DATE,
     CONSTRAINT FK_Candidato_Cargo FOREIGN KEY (Cargo_id) REFERENCES Cargo(id)
 );
 
@@ -50,6 +52,7 @@ CREATE TABLE Evaluacion (
     id SERIAL PRIMARY KEY,
     fecha_evaluacion DATE NOT NULL,
     resultado_general TEXT,
+    observaciones TEXT,
     Solicitud_id INT NOT NULL,
     CONSTRAINT FK_Evaluacion_Solicitud FOREIGN KEY (Solicitud_id) REFERENCES Solicitud(id)
 );
