@@ -51,10 +51,11 @@ app.get('/api/test-db', async (req, res) => {
 app.get('/api/candidatos', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT c.id, c.nombre_completo, c.origen, c.ruta_cv, cg.nombre AS cargo_postulado,
+      SELECT c.id, c.nombre_completo, c.correo, c.telefono, c.origen, c.ruta_cv, cg.nombre AS cargo_postulado,
              EXISTS(SELECT 1 FROM Solicitud s WHERE s.Candidato_id = c.id) as tiene_solicitud
       FROM Candidato c 
       INNER JOIN Cargo cg ON c.Cargo_id = cg.id 
+      WHERE c.estado = 'En consideración'
       ORDER BY c.id DESC
     `);
     res.json(result.rows);
@@ -64,16 +65,46 @@ app.get('/api/candidatos', async (req, res) => {
   }
 });
 
+// GET /api/candidatos/aprobados - Candidatos que aprobaron la evaluación psicolaboral
+app.get('/api/candidatos/aprobados', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT c.id, c.nombre_completo, c.correo, c.telefono, c.origen, c.ruta_cv,
+             cg.nombre AS cargo_postulado
+      FROM Candidato c
+      INNER JOIN Cargo cg ON c.Cargo_id = cg.id
+      WHERE c.estado = 'Aprobado'
+      ORDER BY c.id DESC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Error al obtener candidatos aprobados' });
+  }
+});
+
 // POST /api/solicitudes - Genera la solicitud de evaluación (y el candidato si viene desde el formulario)
 app.post('/api/solicitudes', upload.single('cv'), async (req, res) => {
   try {
     // Caso 1: Si solo viene el candidato_id (Lógica para candidatos ya existentes desde CandidatosPage)
     if (req.body.candidato_id) {
       const nuevaSolicitud = await pool.query(
-        `INSERT INTO Solicitud (fecha_creacion, estado, Candidato_id) 
-         VALUES (CURRENT_DATE, 'Pendiente', $1) RETURNING *`,
+        `INSERT INTO Solicitud (fecha_creacion, estado, Candidato_id)
+         SELECT CURRENT_DATE, 'Pendiente', c.id
+         FROM Candidato c
+         WHERE c.id = $1
+           AND c.estado = 'En consideración'
+           AND NOT EXISTS (
+             SELECT 1 FROM Solicitud s WHERE s.Candidato_id = c.id
+           )
+         RETURNING *`,
         [req.body.candidato_id]
       );
+      if (nuevaSolicitud.rowCount === 0) {
+        return res.status(409).json({
+          error: 'El candidato ya tiene una solicitud o no está en consideración.'
+        });
+      }
       return res.status(201).json(nuevaSolicitud.rows[0]);
     }
 
@@ -109,15 +140,55 @@ app.post('/api/solicitudes', upload.single('cv'), async (req, res) => {
   }
 });
 
-// DELETE /api/candidatos/:id - Elimina un candidato (Descartar)
-app.delete('/api/candidatos/:id', async (req, res) => {
-  const { id } = req.params;
+// GET /api/candidatos/archivados - Descartados o reprobados durante el último mes
+app.get('/api/candidatos/archivados', async (req, res) => {
   try {
-    await pool.query('DELETE FROM Candidato WHERE id = $1', [id]);
-    res.json({ mensaje: 'Candidato descartado exitosamente' });
+    const result = await pool.query(`
+      SELECT c.id, c.nombre_completo, c.correo, c.telefono, c.origen, c.ruta_cv, c.estado,
+             TO_CHAR(c.fecha_cierre, 'DD-MM-YYYY') AS fecha_cierre,
+             cg.nombre AS cargo_postulado
+      FROM Candidato c
+      INNER JOIN Cargo cg ON c.Cargo_id = cg.id
+      WHERE c.estado IN ('Descartado', 'Reprobado')
+        AND c.fecha_cierre >= CURRENT_DATE - INTERVAL '1 month'
+      ORDER BY c.fecha_cierre DESC, c.id DESC
+    `);
+    res.json(result.rows);
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ error: 'Error al descartar candidato. Es posible que ya esté en proceso de evaluación.' });
+    res.status(500).json({ error: 'Error al obtener candidatos archivados' });
+  }
+});
+
+// PATCH /api/candidatos/:id/descartar - Marca como descartado sin eliminar su historial
+app.patch('/api/candidatos/:id/descartar', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(`
+      UPDATE Candidato c
+      SET estado = 'Descartado', fecha_cierre = CURRENT_DATE
+      WHERE c.id = $1
+        AND c.estado = 'En consideración'
+        AND NOT EXISTS (
+          SELECT 1 FROM Solicitud s WHERE s.Candidato_id = c.id
+        )
+      RETURNING c.id, c.estado,
+                TO_CHAR(c.fecha_cierre, 'DD-MM-YYYY') AS fecha_cierre
+    `, [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(409).json({
+        error: 'El candidato ya tiene una solicitud o no está en consideración.'
+      });
+    }
+
+    res.json({
+      mensaje: 'Candidato descartado exitosamente',
+      candidato: result.rows[0]
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Error al descartar candidato' });
   }
 });
 
@@ -213,7 +284,7 @@ app.post('/api/evaluaciones', async (req, res) => {
   try {
     await client.query('BEGIN');
     const solicitud = await client.query(
-      `SELECT id FROM Solicitud WHERE id = $1 AND estado = 'En proceso' FOR UPDATE`,
+      `SELECT id, Candidato_id FROM Solicitud WHERE id = $1 AND estado = 'En proceso' FOR UPDATE`,
       [solicitudId]
     );
 
@@ -231,6 +302,14 @@ app.post('/api/evaluaciones', async (req, res) => {
     await client.query(
       `UPDATE Solicitud SET estado = 'Finalizada' WHERE id = $1`,
       [solicitudId]
+    );
+
+    await client.query(
+      `UPDATE Candidato
+       SET estado = CASE WHEN $1 = 'Rechazado' THEN 'Reprobado' ELSE 'Aprobado' END,
+           fecha_cierre = CASE WHEN $1 = 'Rechazado' THEN CURRENT_DATE ELSE NULL END
+       WHERE id = $2`,
+      [resultado, solicitud.rows[0].candidato_id]
     );
 
     await client.query('COMMIT');

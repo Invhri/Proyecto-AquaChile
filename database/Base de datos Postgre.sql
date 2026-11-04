@@ -29,6 +29,8 @@ CREATE TABLE Candidato (
     ruta_cv VARCHAR(255) NOT NULL,
     origen VARCHAR(20) DEFAULT 'Externo',
     Cargo_id INT NOT NULL,
+    estado VARCHAR(20) NOT NULL DEFAULT 'En consideración',
+    fecha_cierre DATE,
     CONSTRAINT FK_Candidato_Cargo FOREIGN KEY (Cargo_id) REFERENCES Cargo(id)
 );
 
