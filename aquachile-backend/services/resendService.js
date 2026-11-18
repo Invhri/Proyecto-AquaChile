@@ -1,6 +1,7 @@
 const { Resend } = require('resend');
 const fs = require('fs');
 const path = require('path');
+const resendService = require('./services/resendService');
 require('dotenv').config();
 
 class ResendService {
