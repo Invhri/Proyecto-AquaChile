@@ -24,6 +24,7 @@ const SolicitudEvaluacionForm = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  const [isMessageError, setIsMessageError] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -75,9 +76,11 @@ const SolicitudEvaluacionForm = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
+    setIsMessageError(false);
 
     if (!validarFormulario()) {
       setMessage("Por favor, corrige los errores.");
+      setIsMessageError(true);
       return;
     }
 
@@ -97,19 +100,24 @@ const SolicitudEvaluacionForm = () => {
         body: dataToSend,
       });
 
+      const responseData = await response.json();
       if (response.ok) {
-        setMessage("Solicitud enviada con éxito.");
+        setMessage(responseData.emailSent === false
+          ? "Tu postulación fue enviada, pero no se pudo enviar el correo de confirmación."
+          : "Postulación enviada con éxito. Recibirás un correo de confirmación.");
+        setIsMessageError(responseData.emailSent === false);
         setFormData({ nombreCandidato: "", correoCandidato: "", telefonoCandidato: "", familiaCargo: "", nombreCargo: "" });
         setCvFile(null);
         setErrors({});
         (e.target as HTMLFormElement).reset();
       } else {
-        const errorData = await response.json();
-        setMessage(`Error: ${errorData.error}`);
+        setMessage(`Error: ${responseData.error}`);
+        setIsMessageError(true);
       }
     } catch (error) {
       console.error("Error:", error);
       setMessage("Error de conexión con el servidor.");
+      setIsMessageError(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -120,7 +128,7 @@ const SolicitudEvaluacionForm = () => {
       <h2>Formulario de Solicitud de Evaluación Psicolaboral</h2>
       <p>Ingrese los datos para iniciar el proceso de AquaChile</p>
 
-      {message && <div className={`mensaje-feedback ${Object.keys(errors).length > 0 ? "mensaje-error-global" : ""}`}>{message}</div>}
+      {message && <div className={`mensaje-feedback ${isMessageError ? "mensaje-error-global" : ""}`}>{message}</div>}
 
       <form onSubmit={handleSubmit} className="formulario-layout" noValidate>
         <div>
@@ -161,7 +169,7 @@ const SolicitudEvaluacionForm = () => {
           {errors.cv && <span className="texto-error">{errors.cv}</span>}
         </div>
         <button type="submit" disabled={isSubmitting} className={`boton-enviar ${isSubmitting ? "boton-deshabilitado" : ""}`}>
-          {isSubmitting ? "Enviando..." : "Solicitar Evaluación"}
+          {isSubmitting ? "Enviando..." : "Enviar Postulación"}
         </button>
       </form>
     </div>
