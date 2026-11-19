@@ -1,30 +1,38 @@
 const { Resend } = require('resend');
 const fs = require('fs');
 const path = require('path');
-const resendService = require('./services/resendService');
 require('dotenv').config();
 
 class ResendService {
   constructor(apiKey = process.env.RESEND_API_KEY) {
-    this.resend = new Resend(apiKey);
-    this.from = 'onboarding@resend.dev';
+    this.apiKey = apiKey;
+    this.from = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
   }
 
   async sendEmail({ to, subject, name, message }) {
-    // 1. Leer la plantilla HTML desde la carpeta templates
+    if (!this.apiKey) {
+      throw new Error('RESEND_API_KEY no está configurada');
+    }
+
+    const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[character]);
+
     const templatePath = path.join(__dirname, '../templates/ConfirmacionPostulacion.html');
     let htmlContent = fs.readFileSync(templatePath, 'utf-8');
 
-    // 2. Reemplazar los marcadores con los datos reales del candidato
     htmlContent = htmlContent
-      .replace('{{name}}', name)
-      .replace('{{message}}', message);
+      .replace('{{name}}', escapeHtml(name))
+      .replace('{{message}}', escapeHtml(message));
 
-    // 3. Enviar el correo
-    const { data, error } = await this.resend.emails.send({
+    const { data, error } = await new Resend(this.apiKey).emails.send({
       from: this.from,
       to: [to],
-      subject: subject,
+      subject,
       html: htmlContent,
     });
 

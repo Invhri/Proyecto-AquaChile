@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
+const resendService = require('./services/resendService');
 
 const app = express();
 app.use(cors());
@@ -130,10 +131,23 @@ app.post('/api/solicitudes', upload.single('cv'), async (req, res) => {
       [nombreCandidato, correoCandidato, telefonoCandidato, cvFileName, origen || 'Externo', cargoId]
     );
 
-    // NOTA CLAVE: Ya NO insertamos una solicitud automáticamente aquí. 
-    // Ahora el candidato entra a la bolsa general y Recursos Humanos decidirá si le genera solicitud o no.
+    let emailSent = true;
+    try {
+      await resendService.sendEmail({
+        to: correoCandidato,
+        subject: 'Confirmación de postulación - AquaChile',
+        name: nombreCandidato,
+        message: `Hemos recibido tu postulación para el cargo ${nombreCargo}. Nuestro equipo revisará tus antecedentes y se pondrá en contacto contigo.`
+      });
+    } catch (emailError) {
+      emailSent = false;
+      console.error('La postulación se guardó, pero no se pudo enviar el correo de confirmación:', emailError.message);
+    }
 
-    res.status(201).json({ message: 'Postulación y CV guardados con éxito en la base general' });
+    res.status(201).json({
+      message: 'Postulación y CV guardados con éxito en la base general',
+      emailSent
+    });
   } catch (err) {
     console.error("Error al procesar la solicitud:", err.message);
     res.status(500).json({ error: 'Error del servidor al procesar la solicitud' });
